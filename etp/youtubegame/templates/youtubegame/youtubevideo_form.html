@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Añadir Ejercicio{% endblock %}
+{% block background %}{% load static %}{% static 'core/img/juego-bg.jpg' %}{% endblock %}
+
+{% load auth_extras %}
+{% block headers %}
+<h1>Juega</h1>
+<span class="subheading">No todo es jugar</span>
+{% endblock %}
+
+{% block content %}
+
+<main role="main">
+  <div class="container">
+    <div class="row mt-3 mb-5">
+      <div class="col-md-9 mx-auto">
+            <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+              {{ form.as_p }}
+              
+              <div class="text-center">
+                <input type="submit" class="btn btn-primary btn-block" value="Añadir Video" />
+              </div>
+            </form>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

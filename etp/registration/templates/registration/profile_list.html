@@ -1,0 +1,71 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Perfil{% endblock %}
+{% block background %} {% static 'core/img/profile-bg.jpg' %} {% endblock %}
+{% block headers %}
+<h1>Perfil</h1>
+<span class="subheading">Actualiza tus datos</span>
+{% endblock %}
+{% block content %}
+
+
+{% if 'okupdate' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Datos actualizados correctamente
+</div>
+{% endif %}
+
+{% if 'okemail' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Email actualizado correctamente
+</div>
+{% endif %}
+
+
+<main role="main">
+        <div class="container">
+            <div class="row justify-content-end">
+                <div class="col-md-3 ">
+                  <a class="btn btn-block btn-success" href=" {% url 'update_profile' %} ">Actualizar Datos</a>          
+                </div>
+            </div>
+        </div>
+  <div class="container well span6">
+    <div class="row mt-3">
+      <div class="col-md-9 mx-auto mb-5">
+          <div class="row">
+            <!-- Previa del avatar -->
+            <div class="col-md-2">
+              {% if request.user.profile.avatar %}
+                <img src="{{request.user.profile.avatar.url}}" class="img-thumbnail">
+              {% else %}
+              <img src="{% static 'core/img/no-avatar.jpg' %}" class="img-thumbnail">              
+                {% endif %}
+                
+
+            </div>
+            <!-- Formulario -->
+            <div class="col-md-10">
+                    <div class="card">
+                            <div class="card-header">
+                            Datos del perfil
+                            </div>
+                            <div class="card-body">
+                            <ul class="list-group">
+                                    <li class="media"><span style="color : gray;"> Nombre Completo :&nbsp;</span> {{profile.name}} {{profile.lastname1}} {{profile.lastname2}}  </li>
+                                    <li class="media"><span style="color : gray;"> Nombre Usuario :&nbsp;</span> {{profile.user.username}}  </li>
+                                    <li class="media"><span style="color : gray;"> Email :&nbsp;</span> {{profile.user.email}}  </li>                                    
+                                    <li class="media"><span style="color : gray;"> Score :&nbsp;</span> {{profile.score}}  </li>
+                                    <li class="media"><span style="color : gray;"> Boleta :&nbsp;</span> {{profile.key}}  </li>                                          
+                                    <li class="media"><span style="color : gray;"> Numero de telefono :&nbsp;</span> {{profile.phone}}  </li>                                     
+                            </ul>
+                            <br> 
+                        </div>
+                        </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

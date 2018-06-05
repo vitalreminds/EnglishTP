@@ -1,0 +1,4 @@
+shadow:1,eat:0,meet:0
+bla:0,feel:1,blabla:0
+$
+bla:0,feel:0,fade:1

@@ -1,0 +1,12 @@
+$
+$
+heart:1,hair:0,hot:0
+black:0,lack:0,back:1
+$
+somewhere:0,something:1,somebody:0
+$
+talk:0,walk:1,wolf:0
+$
+girls:1,legs:0,feels:0
+$
+together:0,forever:1,ever:0

@@ -1,0 +1,166 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Grupos{% endblock %}
+
+{% block background %}{% load static %}{% static 'core/img/grupo-bg.png' %}{% endblock %}
+{% load auth_extras %}
+{% block headers %}
+<h1>Grupos</h1>
+<span class="subheading">Accede a tus tareas</span>
+{% endblock %}
+
+
+{% block content %}
+
+    
+    {%  if request.user|has_group:"Profesor" %}
+    <div class="row justify-content-center">
+            <ul class="list-group col-md-8">
+                    <li class="list-group-item list-group-item-primary">Grupos</li>   
+    {% for group in group1_list %}
+    {% if group.teacher.user == request.user %}
+    <li class="list-group-item">
+            <ul class="nav">
+                    <li class="nav-item mt-2">
+                        {{group.name}} 
+                        {{group.teacher}} 
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="  {% url 'exercises:exercises' group.name|slugify %} "><i class="fas fa-upload fa-x"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href=" {% url 'exercises:updategroup' group.id %} "><i class="fas fa-user-plus fa-x"></i></a>
+                      </li>
+                    
+            </ul>
+    </li>
+
+    
+    {% endif %}
+    {% endfor %}
+        </ul>
+        </div>
+    {% endif %}
+
+    {%  if request.user.is_superuser %}
+    <div class="container">
+            <div class="row justify-content-end">
+              <div class="col-md-3 text-center">
+              <a class="btn btn-block btn-success text-center" href=" {% url 'exercises:creategroup' %} ">Añadir Grupo</a>          
+              </div>
+            </div>
+          </div>
+        <br>
+
+        
+    <div class="row justify-content-center">
+    <ul class="list-group col-md-8">
+            <li class="list-group-item list-group-item-primary">Grupos</li>
+        
+    {% for group in group1_list %}
+        
+            <li class="list-group-item">
+                    <ul class="nav">
+                            <li class="nav-item mt-2">
+                                {{group.name}} 
+                                {{group.teacher}} 
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link" href=" {% url 'exercises:deletegroup' group.id %} "><i class="far fa-trash-alt fa-x"></i></a>
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link" href=" {% url 'exercises:updategroup' group.id %} "><i class="far fa-edit fa-x"></i></a>
+                            </li>
+
+                             <li class="nav-item">
+                                <a class="nav-link" href="  {% url 'exercises:exercises' group.name|slugify %} "><i class="fas fa-upload fa-x"></i></a>
+                            </li>
+                    </ul>
+            </li>
+          {% endfor %}
+            
+        </ul>
+    </div>
+    </div>
+    {% endif %}
+
+    {%  if request.user|has_group:"Alumno" %}
+
+        
+    <div class="row justify-content-center">
+    <ul class="list-group col-md-8">
+            <li class="list-group-item list-group-item-primary">Grupos</li>
+            
+        
+    {% for group in group1_list %}
+        {% if request.user.alumn in group.alumn.all %}
+            <li class="list-group-item">
+                    <ul class="nav">
+                            <li class="nav-item mt-2">
+                                {{group.name}} 
+                                {{group.teacher}} 
+                            </li>
+                             <li class="nav-item">
+                                <a class="nav-link" href="  {% url 'exercises:exercises' group.name|slugify %} "><i class="far fa-file-alt fa-x"></i></a>
+                            </li>
+                    </ul>
+            </li>
+            {% endif %}
+          {% endfor %}
+            
+        </ul>
+    </div>
+    </div>
+    {% endif %}
+
+    
+
+
+    <!-- {%  if request.user.is_superuser %}
+    {% for exercise in exercise_list %}
+    <hr>
+    <ul class="nav justify-content-center">
+            
+
+        <div class="row project">  	
+            <div class="col-lg-3 col-md-4 offset-lg-1">
+                <img class="img-fluid" src="{% static 'core/img/PDF.png' %}" alt="">
+            </div>
+            <div class="col-lg-7 col-md-8">
+                <h2 class="section-heading title"> {{exercise.title}} </h2>   
+                <p class="container-fluid"> {{exercise.url}} </p>
+            </div>
+        </div>
+        <br>            
+            <ul class="nav justify-content-center">
+                    <li class="nav-item">
+                    <a href="{% url 'exercises:download' exercise.id %}" class="btn btn-primary btn-block">Descargar</a>                       
+                    </li>
+            </ul>
+    {% endfor %}
+    {% endif %}
+
+    {%  if request.user|has_group:"Alumno" %}    
+    {% for exercise in exercise_list %}
+    
+    <hr>
+
+        <div class="row project">  	
+            <div class="col-lg-3 col-md-4 offset-lg-1">
+                <img class="img-fluid" src="{% static 'core/img/PDF.png' %}" alt="">
+            </div>
+            <div class="col-lg-7 col-md-8">
+                <h2 class="section-heading title"> {{exercise.title}} </h2>   
+                <p class="container-fluid"> {{exercise.url}} </p>
+            </div>
+        </div>
+        <br>            
+            <ul class="nav justify-content-center">
+                    <li class="nav-item">
+                    <a href="{% url 'exercises:download' exercise.id %}" class="btn btn-primary btn-block">Descargar</a>                       
+                    </li>
+            </ul>
+    {% endfor %}
+    {% endif %}
+        -->
+{% endblock %}

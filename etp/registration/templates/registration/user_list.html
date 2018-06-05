@@ -1,0 +1,101 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Baja{% endblock %}
+
+{% block background %}{% load static %}{% static 'core/img/delete.jpg' %}{% endblock %}
+{% load auth_extras %}
+{% block headers %}
+<h1>Baja</h1>
+<span class="subheading">X</span>
+{% endblock %}
+
+
+{% block content %}
+
+{% if 'okdelete' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Usuario eliminado correctamente
+</div>
+{% endif %}
+
+{% if 'notdelete' in request.GET %}
+<div class="alert alert-danger" role="alert">
+    Error al intentar eliminar usuario
+</div>
+{% endif %}
+
+<div class="row">
+
+<ul class="list-group col-md-4 text-center">
+    <li class="list-group-item list-group-item-primary">Alumnos</li>    
+    {% for alumn in Alumns %}
+        <li class="list-group-item list-group-item-action">
+                <ul class="nav justify-content-center ">
+                        <li class="nav-item">
+                          <a class="nav-link" href=" {% url 'delete_user' alumn %} "><i class="far fa-trash-alt fa-x"></i></a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href=" {% url 'update_profilebyid' alumn.user.profile.id %} "><i class="far fa-edit fa-x"></i></a>
+                        </li>
+                      </ul>
+                <ul class="nav justify-content-center ">
+                        <li class="nav-item mt-2">
+                            {{alumn.key}} 
+                            {{alumn}}                     
+                        </li>
+                      </ul>
+        </li>
+    {% endfor %}
+</ul>
+
+<br>
+
+<ul class="list-group col-md-4 text-center">
+        <li class="list-group-item list-group-item-primary">Profesores</li>    
+        {% for teacher in Teachers %}
+            <li class="list-group-item list-group-item-action">
+                    <ul class="nav  justify-content-center">
+                            <li class="nav-item">
+                              <a class="nav-link" href=" {% url 'delete_user' teacher %} "><i class="far fa-trash-alt fa-x"></i></a>
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link" href="{% url 'update_profilebyid' teacher.user.profile.id %}"><i class="far fa-edit fa-x"></i></a>
+                            </li>
+                          </ul>
+                    <ul class="nav  justify-content-center">
+                            <li class="nav-item mt-2">
+                                {{teacher.key}} 
+                                {{teacher}} 
+                            </li>
+                          </ul>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <br>
+
+    <ul class="list-group col-md-4 text-center ">
+            <li class="list-group-item list-group-item-primary">Proveedores</li>    
+            {% for provider in Providers %}
+                <li class="list-group-item list-group-item-action">
+                        <ul class="nav  justify-content-center">
+                                <li class="nav-item">
+                                  <a class="nav-link" href=" {% url 'delete_user' provider %} "><i class="far fa-trash-alt fa-x"></i></a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" href="{% url 'update_profilebyid' provider.user.profile.id %}"><i class="far fa-edit fa-x"></i></a>
+                                </li>
+                              </ul>
+                        <ul class="nav  justify-content-center">
+                                <li class="nav-item mt-2">
+                                    {{provider.id}} 
+                                    {{provider}} 
+                                </li>
+                              </ul>
+                </li>
+            {% endfor %}
+        </ul>
+        </div>
+
+    
+{% endblock %}

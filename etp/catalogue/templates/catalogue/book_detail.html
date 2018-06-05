@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Catalogo{% endblock %}
+
+{% block background %}{% load static %}{% static 'core/img/catalogue-bg.jpg' %}{% endblock %}
+{% load auth_extras %}
+
+{% block headers %}
+<h1>Catalogo</h1>
+<span class="subheading">Libros</span>
+{% endblock %}
+
+
+{% block content %}
+{% include 'catalogue/includes/books_menu.html' %}
+
+        
+
+        <div class="row project">  	
+            <div class="col-lg-3 col-md-4 offset-lg-1">
+                <img class="img-thumbnail" src=" {{book.cover_page.url}} " alt="portada">
+            </div>
+            <div class="col-lg-7 col-md-8">
+                    <div class="card">
+                            <div class="card-header">
+                            Datos del libro
+                            </div>
+                            <div class="card-body">
+                            <ul class="list-group">
+                                    <li class="media"><h5> {{book.title}} </h5></li>                                    
+                                    <li class="media"> {{book.description|safe}} </li>
+                                    <li class="media"><span style="color : gray;">Editorial :&nbsp;</span> {{book.editorial}} </li>
+                                    <li class="media"><span style="color : gray;">Edicion :&nbsp;</span> {{book.edition}} </li>
+                                    <li class="media"><span style="color : gray;">Autor :&nbsp;</span> {{book.autor}} </li>
+                                    <li class="media"><span style="color :gray;">ISBN :&nbsp;</span> {{book.ISBN}} </li>
+                                    <li class="media"><span style="color :orangered;">Precio :&nbsp;</span> {{book.price}} </li>
+                            </ul>
+                            {%  if not request.user|has_group:"Proveedor" %}
+                            <br>                            
+                            <a href=" {% url 'catalogue:order' book.id %} " class="btn btn-success">Pedir</a>
+                            {% endif %}
+                        </div>
+                        </div>
+        </div>
+{% endblock %}

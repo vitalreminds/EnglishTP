@@ -1,0 +1,78 @@
+
+.score-announcement {
+  background-color: #0e5c87;
+  margin-bottom: 15px;
+  color: white;
+  border-radius: 10px;
+}
+
+.scoreTick {
+  position: absolute;
+  height: 100%;
+  width: 4px;
+  background-color: #404040;
+  left: 1%;
+  transition: left 300ms linear;
+}
+
+.scoreArrow {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 20px solid #0e5c87;
+  position: absolute;
+  top: -18px;
+  left: 1%;
+  margin-left: -18px;
+  transition: left 300ms linear;
+}
+
+.scaleTicks {
+  display: table;
+  height: 15px;
+  width: 100%;
+  padding: 0;
+}
+.scaleTicks li {
+  display: table-cell;
+  height: 15px;
+  width: 24.5%;
+  line-height: 15px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.scaleColors {
+  display: table;
+  position: relative;
+  height: 40px;
+  width: 100%;
+  padding: 0;
+}
+.scaleColors li {
+  display: table-cell;
+  height: 40px;
+  width: 25%;
+  line-height: 40px;
+  text-align: center;
+  border-right: 1px solid #fff;
+  white-space: nowrap;
+}
+.scaleColors li:nth-child(1) {
+  background-color: #EF2726;
+  background-image: linear-gradient(to right, #EF2726, #F1A722);
+}
+.scaleColors li:nth-child(2) {
+  background-color: #F1A722;
+  background-image: linear-gradient(to right, #F1A722, #F2E21B);
+}
+.scaleColors li:nth-child(3) {
+  background-color: #F2E21B;
+  background-image: linear-gradient(to right, #F2E21B, #8AC141);
+}
+.scaleColors li:nth-child(4) {
+  background-color: #8AC141;
+  border-right: 0;
+}
+

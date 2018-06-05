@@ -1,0 +1,212 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Catalogo{% endblock %}
+
+{% block background %}{% load static %}{% static 'core/img/catalogue-bg.jpg' %}{% endblock %}
+{% load auth_extras %}
+{% block headers %}
+<h1>Catalogo</h1>
+<span class="subheading">Libros</span>
+{% endblock %}
+
+
+{% block content %}
+
+{% if 'okdelete' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Libro eliminado correctamente
+</div>
+{% endif %}
+
+{% if 'okcreate' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Libro creado correctamente
+</div>
+{% endif %}
+
+
+{% if 'okorder' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Libro apartado correctamente
+</div>
+{% endif %}
+
+{% if 'notorder' in request.GET %}
+<div class="alert alert-danger" role="alert">
+    Ya haz apartado este libro. Intenta con otro
+</div>
+{% endif %}
+
+{% include 'catalogue/includes/books_menu.html' %}
+    
+    
+    
+        {%  if request.user|has_group:"Proveedor" %}
+        <div class="container">
+                <div class="row justify-content-end">
+                  <div class="col-md-2 ">
+                  <a class="btn btn-block btn-success" href=" {% url 'catalogue:create' %} ">Añadir libro</a>          
+                  </div>
+                </div>
+              </div>
+            {% for book in book_list %}
+                {% if book.provider == request.user %}
+
+                
+                <hr>
+                <ul class="nav justify-content-center">
+                        <li class="nav-item">
+                          <a class="nav-link" href="{% url 'catalogue:delete' book.id %}"><i  class="far fa-trash-alt fa-2x"></i></a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{% url 'catalogue:update' book.id %}"><i class="far fa-edit fa-2x"></i></a>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-warning btn-block">
+                                Cantidad <span class="badge badge-light"> {{book.quantity}} </span>
+                            </button>
+                        </li>
+                      </ul>
+                
+                      <div class="row project justify-content-center">  	
+                            <div class="col-lg-3 col-md-4 col-sm-6 offset-lg-1 d-block">
+                                <img class="img-thumbnail rounded mx-auto d-block" src=" {{book.cover_page.url}} " alt="portada">
+                            </div>
+                            <div class="col-lg-7 col-md-8">
+                                    <div class="card">
+                                            <div class="card-header">
+                                            Datos del libro
+                                            </div>
+                                            <div class="card-body">
+                                            <ul class="list-group">
+                                                    <li class="media"><h5> {{book.title}} </h5></li>                                    
+                                                    <li class="media"> {{book.description|safe}} </li>
+                                                    <li class="media"><span style="color : gray;">Editorial :&nbsp;</span> {{book.editorial}} </li>
+                                                    <li class="media"><span style="color : gray;">Edicion :&nbsp;</span> {{book.edition}} </li>
+                                                    <li class="media"><span style="color : gray;">Autor :&nbsp;</span> {{book.autor}} </li>
+                                                    <li class="media"><span style="color :gray;">ISBN :&nbsp;</span> {{book.ISBN}} </li>
+                                                    <li class="media"><span style="color :orangered;">Precio :&nbsp;</span> {{book.price}} </li>
+                                            </ul>
+                                            {%  if not request.user|has_group:"Proveedor" %}
+                                            <br>                            
+                                            <a href=" {% url 'catalogue:order' book.id %} " class="btn btn-success">Pedir</a>
+                                            {% endif %}
+                                        </div>
+                                        </div>
+                                        </div>
+                        </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {%  if request.user.is_superuser %}
+            {% for book in book_list %}
+            <hr>
+            <ul class="nav justify-content-center">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'catalogue:delete' book.id %}"><i class="far fa-trash-alt fa-2x"></i></a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'catalogue:update' book.id %}"><i class="far fa-edit fa-2x"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-warning btn-block">
+                            Cantidad <span class="badge badge-light"> {{book.quantity}} </span>
+                        </button>
+                    </li>
+                  </ul>
+                        
+                  <div class="row project justify-content-center">  	
+                        <div class="col-lg-3 col-md-4 col-sm-6 offset-lg-1">
+                            <img class="img-thumbnail" src=" {{book.cover_page.url}} " alt="portada">
+                        </div>
+                        <div class="col-lg-7 col-md-8">
+                                <div class="card">
+                                        <div class="card-header">
+                                        Datos del libro
+                                        </div>
+                                        <div class="card-body">
+                                        <ul class="list-group">
+                                                <li class="media"><h5> {{book.title}} </h5></li>                                    
+                                                <li class="media"> {{book.description|safe}} </li>
+                                                <li class="media"><span style="color : gray;">Editorial :&nbsp;</span> {{book.editorial}} </li>
+                                                <li class="media"><span style="color : gray;">Edicion :&nbsp;</span> {{book.edition}} </li>
+                                                <li class="media"><span style="color : gray;">Autor :&nbsp;</span> {{book.autor}} </li>
+                                                <li class="media"><span style="color :gray;">ISBN :&nbsp;</span> {{book.ISBN}} </li>
+                                                <li class="media"><span style="color :orangered;">Precio :&nbsp;</span> {{book.price}} </li>
+                                        </ul>
+                                    </div>
+                                    </div>
+                                    </div>
+                    </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if request.user|has_group:"Profesor" or request.user|has_group:"Alumno" or not request.user.is_authenticated %}
+        {% for book in book_list %}
+        <hr>
+        <div class="row project justify-content-center">  	
+                <div class="col-lg-3 col-md-4 col-sm-6 offset-lg-1">
+                    <img class="img-thumbnail" src=" {{book.cover_page.url}} " alt="portada">
+                </div>
+                <div class="col-lg-7 col-md-8">
+                        <div class="card">
+                                <div class="card-header">
+                                Datos del libro
+                                </div>
+                                <div class="card-body">
+                                <ul class="list-group">
+                                        <li class="media"><h5> {{book.title}} </h5></li>                                    
+                                        <li class="media"> {{book.description|safe}} </li>
+                                        <li class="media"><span style="color : gray;">Editorial :&nbsp;</span> {{book.editorial}} </li>
+                                        <li class="media"><span style="color : gray;">Edicion :&nbsp;</span> {{book.edition}} </li>
+                                        <li class="media"><span style="color : gray;">Autor :&nbsp;</span> {{book.autor}} </li>
+                                        <li class="media"><span style="color :gray;">ISBN :&nbsp;</span> {{book.ISBN}} </li>
+                                        <li class="media"><span style="color :orangered;">Precio :&nbsp;</span> {{book.price}} </li>
+                                </ul>
+                                {%  if request.user.is_authenticated %}
+                                <br>                            
+                                <a href=" {% url 'catalogue:order' book.id %} " class="btn btn-success">Pedir</a>
+                                {% endif %}
+                            </div>
+                            </div>
+            </div>
+            </div>
+        {% endfor %}
+        {% endif %}
+
+
+<!-- Menú de paginación -->
+<br>
+<br>
+{% if is_paginated %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item ">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+        </li>
+      {% endif %}
+      {% for i in paginator.page_range %}
+        <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+          <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item ">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">&raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+{% endblock %}

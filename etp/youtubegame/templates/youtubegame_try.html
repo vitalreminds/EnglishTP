@@ -1,0 +1,477 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Juego{% endblock %}
+
+{% block background %}{% load static %}{% static 'core/img/juego-bg.jpg' %}{% endblock %}
+
+{% block headers %}
+<h1>Juego</h1>
+<span class="subheading">Diviertete</span>
+<link href="{% static 'core/css/scoreboard.css' %}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+
+<div>
+              <!-- Modal -->
+              <div class="modal fade show" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Resultados</h5>
+                    </div>
+                    <div id="modalBody" class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{% url 'login' %}" class="btn btn-primary" >Ok</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+</div>
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+        
+      <div class="sixteen columns score-scale">
+        <!-- This element will animate where the credit score will fall in the scale from 200-850. The data attribute should be a value from 1-100. So a credit score of 764 is 89% of 850, so it needs to be 89 -->
+        <ul data-animate="colorScale" data-value="500" class="scaleColors">
+          <li></li><li></li><li></li><li></li>
+          <div class="scoreTick"></div>
+          <div class="scoreArrow"></div>
+        </ul>
+        <ul class="scaleTicks">
+          <li class="h6">0</li>
+          <li class="h6">100</li>
+          <li class="h6">200</li>
+          <li class="h6">300</li>
+          <li class="h6">400</li>
+        </ul>
+      </div>
+      </div>
+    </div>
+  </div>
+
+<div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="embed-responsive embed-responsive-21by9">
+                    <iframe onload="this.width=screen.width;" id="player" src="https://www.youtube.com/embed/HCjNJDNzw8Y?controls=0&showinfo=0&rel=0&enablejsapi=1"></iframe>                
+            </div>
+        </div>
+        <div></div>
+    </div>
+    
+    <div class="row justify-content-center mt-2">
+            <div class="col-1 col-md-1 text-center">
+                    <i id="retry" class="fas fa-arrow-alt-circle-left fa-2x "></i>            
+            </div>
+        <div class="col-9 col-sm-9 col-md-6 mt-2 ml-3">
+            <div class="progress">
+                    <div id="progress-bar" class="progress-bar progress-bar-striped" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="row justify-content-center mt-2">
+        
+        <div class="col-md-8 col-12 text-center">
+                <div id="letter-div" class="p-1 h6 bg-info text-white"></div>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center mt-2 ">
+        <div class="col-3 h6 col-md-2 text-center"> <!--Cajitas con drag an drop-->
+            <div id="p1" class="p-1 bg-dark text-white"ondragstart="drag(event)"  draggable="true"></div>
+        </div>
+        <div  class="col-3 h6 col-md-2 ml-2 text-center"> <!--Cajitas con drag an drop-->
+            <div id="p2" class="p-1 bg-dark text-white" ondragstart="drag(event)" draggable="true"></div>
+        </div>
+        <div class="col-3 h6 col-md-2 ml-2 text-center"> <!--Cajitas con drag an drop-->
+            <div id="p3" class="p-1 bg-dark text-white" ondragstart="drag(event)"  draggable="true"></div>
+        </div>
+    </div>
+
+
+
+<script>
+
+    var LRC_URL =  " {% static 'core/lettertry.txt' %} ";
+    var P_URL =  " {% static 'core/letterwordtry.txt' %} ";    
+    var times = [];
+    var words;
+    var p1;
+    var p2;
+    var x1;
+    var p3;
+    var letter = [];
+    var flag = true;
+    var repit = false;
+    var retry=0;
+    var pa=0;
+    var pe=0;
+    var rt;
+    var stop;
+    var score=0;
+    var t = 0;
+
+    
+    
+    $.ajax
+    (
+    {
+        url : LRC_URL,
+        dataType: "text",
+        success : function (data) 
+        {
+            var lrc = data.split('\n');
+            for (var i of lrc)
+            {
+                var x = i.split(']');
+                times.push(x[0]);
+                letter.push(x[1]);
+            }
+        }
+    }
+    );
+
+    $.ajax
+    (
+    {
+        url : P_URL,
+        dataType: "text",
+        success : function (data) 
+        {
+            words = data.split('\n');
+        }
+    }
+    );
+      var time_update_interval = 0;
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player( 'player', {
+          events: { 
+              'onStateChange': onPlayerStateChange,
+              'onReady' : initialize
+              }
+        });
+      }
+
+
+function initialize(){
+
+// Update the controls on load
+//updateTimerDisplay();
+updateProgressBar();
+
+// Clear any old interval.
+clearInterval(time_update_interval);
+
+// Start interval to update elapsed time display and
+// the elapsed part of the progress bar every second.
+time_update_interval = setInterval(function () {
+    //updateTimerDisplay();
+    updateScoreBar();
+    updateProgressBar();
+    updateLetterDiv();
+}, 80);
+
+
+}
+
+
+
+function updateScoreBar(){
+    // Update the value of our progress bar accordingly.
+    //$('#progress-bar').val((player.getCurrentTime() / player.getDuration()) * 100);
+
+    $(".scoreTick").css("left",(score/4)+"%");
+    $(".scoreArrow").css("left",(score/4)+"%");
+}
+
+function updateProgressBar(){
+    // Update the value of our progress bar accordingly.
+    //$('#progress-bar').val((player.getCurrentTime() / player.getDuration()) * 100);
+    $("#progress-bar").css("width",(player.getCurrentTime() / player.getDuration()) * 100+"%");
+}
+
+$('#retry').on('click', function() {
+    if(x1 >= stop)
+{   
+    player.seekTo(retry);
+    repit=true;
+    player.seekTo(retry);
+    player.playVideo();
+    
+}
+else{
+    player.seekTo(retry);
+    player.playVideo();
+}
+});
+
+
+function getTimeFormat(time)
+{
+    min = parseFloat( time.split(":")[0] );
+    seg = parseFloat( time.split(":")[1] );
+
+    segt = (min * 60) + seg;
+
+    return segt-.6;
+}
+
+function incrementPointSB()
+{
+    pa++;
+    score += 30;
+}
+
+function decrementPointSB()
+{
+    pe++;
+    if( score > 15)
+    {
+        score -= 15;
+    }
+    else
+    {
+        score = 0;
+    }
+}
+
+function evaluateWord(divWord)
+{
+    if(divWord == "p1")
+    {
+        if(p1.split(":")[1] == "1")
+        {
+            $("#droppable").toggleClass("bg-light");
+            $("#droppable").addClass("bg-success");
+            incrementPointSB();
+        }
+        else
+        {
+            $("#droppable").toggleClass("bg-light");
+            $("#droppable").addClass("bg-danger");
+            decrementPointSB();            
+        }
+    }
+    if(divWord == "p3")
+    {
+        if(p3.split(":")[1] == "1")
+        {
+            $("#droppable").toggleClass("bg-light");
+            $("#droppable").addClass("bg-success");
+            incrementPointSB();            
+        }
+        else
+        {
+            $("#droppable").toggleClass("bg-light");
+            $("#droppable").addClass("bg-danger");
+            decrementPointSB();                        
+        }
+    }
+    if(divWord == "p2")
+    {
+        if(p2.split(":")[1] == "1")
+        {
+            $("#droppable").toggleClass("bg-light");
+            $("#droppable").addClass("bg-success");
+            incrementPointSB();            
+        }
+        else
+        {
+            $("#droppable").toggleClass("bg-light");
+            $("#droppable").addClass("bg-danger");
+            decrementPointSB();                        
+        }
+    }
+
+if(x1 >= stop)
+{   
+    player.seekTo(retry);
+    repit=true;
+    player.seekTo(retry);
+    player.playVideo();
+    
+}
+flag=true;
+    
+}
+
+function printWords(words)
+{
+    p1 = words.split(",")[0];
+    p2 = words.split(",")[1];
+    p3 = words.split(",")[2];
+
+    $("#p1").text(p1.split(":")[0]);
+    $("#p2").text(p2.split(":")[0]);
+    $("#p3").text(p3.split(":")[0]);
+    
+    
+}
+
+function printDivTextEsp(l)
+{   
+    $("#erase").remove();
+    var $newDiv = $("<div/>")   // creates a div element
+                 .attr("id", "erase")  // adds the id
+                 .addClass("row justify-content-center");
+    $newDiv.append('<p class="h6">'+ l.split("$")[0] +'&nbsp;</p>');
+    $newDiv.append('<div id="droppable" class="h6 col-2 col-md-2 p-1 bg-light text-dark text-center mt-2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>');
+    $newDiv.append('<p class="h6"> &nbsp;'+ l.split("$")[1] +'</p>');
+    
+
+
+    $("#letter-div").append($newDiv);
+}
+
+function updateLetterDiv()
+{  
+    x1 = parseFloat(player.getCurrentTime().toFixed(2));
+
+    if (!flag && x1 >= stop && !repit)
+    {
+
+        player.pauseVideo();
+
+    }
+
+
+    if( t<times.length-1 && x1 >= getTimeFormat(times[t]) && x1 < getTimeFormat(times[t+1]) && flag && !repit)
+    {
+
+        retry = getTimeFormat(times[t]);
+        stop = getTimeFormat(times[t+1]);
+        console.log(letter[t]);
+        if(letter[t].includes("$"))
+        {
+
+            ///Pintar palabras en tres drag and drop
+            
+            printDivTextEsp(letter[t]);
+            printWords(words[t]);
+            flag = false;
+            $("#p1").attr("draggable","True");
+            $("#p2").attr("draggable","True");
+            $("#p3").attr("draggable","True");            
+        }
+        else
+        {
+            $("#p1").text("");
+            $("#p2").text("");
+            $("#p3").text("");
+            
+            $("#erase").remove();
+            document.getElementById("letter-div").textContent = letter[t];
+            //printDivText(letter[t]);            
+        }
+        t++;
+        
+    }
+
+    if( t==times.length-1 && x1 >= getTimeFormat(times[t]) && flag && !repit)
+    {
+
+        retry = getTimeFormat(times[t]);
+        stop = parseFloat(player.getDuration().toFixed(2));
+        console.log(letter[t]);
+        if(letter[t].includes("$"))
+        {
+
+            ///Pintar palabras en tres drag and drop
+            
+            printDivTextEsp(letter[t]);
+            printWords(words[t]);
+            flag = false;
+            $("#p1").attr("draggable","True");
+            $("#p2").attr("draggable","True");
+            $("#p3").attr("draggable","True");            
+        }
+        else
+        {
+            $("#p1").text("");
+            $("#p2").text("");
+            $("#p3").text("");
+            
+            $("#erase").remove();
+            document.getElementById("letter-div").textContent = letter[t];
+            //printDivText(letter[t]);            
+        }
+        
+t++;
+        
+    }
+
+    if(repit)
+    {
+        if(x1 >= stop)
+        {
+            repit=false;
+        }
+    }
+
+
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    clone = document.getElementById(data).cloneNode(true); // true means clone all childNodes and all event handlers
+    clone.id = "x";
+    ev.target.appendChild(clone);
+    if(data == "p1")
+    {        
+        $("#p2").attr("draggable","False");
+        $("#p3").attr("draggable","False");        
+    }
+    if(data == "p2")
+    {        
+        $("#p1").attr("draggable","False");
+        $("#p3").attr("draggable","False");        
+    }
+    if(data == "p3")
+    {        
+        $("#p1").attr("draggable","False");
+        $("#p2").attr("draggable","False");        
+    }
+
+    evaluateWord(data);
+    
+}
+
+
+      function onPlayerStateChange(event) {
+          initialize();
+        switch(event.data) {
+          case 0:
+          $("#score").val(score);
+          $("#modalBody").html("Palabras acertadas : "+pa+"<br>Palabras erroneas :"+pe+"<br>Puntaje total : "+score+"<br>Para jugar mas registrate!");
+          $('#myModal').modal('show');
+          
+            break;
+
+        }
+      }
+
+
+
+
+    </script>
+    <script src=" {% static 'core/js/youtubegame.js' %} "></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+{% endblock %}
+

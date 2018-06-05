@@ -1,0 +1,182 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Ejercicios{% endblock %}
+
+{% block background %}{% load static %}{% static 'core/img/exercises-bg.jpg' %}{% endblock %}
+{% load auth_extras %}
+{% block headers %}
+<h1>Ejercicios</h1>
+<span class="subheading">No todo es jugar</span>
+{% endblock %}
+
+
+{% block content %}
+
+{% if 'okcreate' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Archivo creado correctamente
+</div>
+{% endif %}
+
+{% if 'okdelete' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Archivo eliminado correctamente
+</div>
+{% endif %}
+
+
+
+{% if request.user|has_group:"Profesor" %}
+
+<ul class="nav justify-content-end">
+    <li class="nav-item">
+      <a class="nav-link btn btn-primary" href="{% url 'exercises:groups'%}">Todos los grupos</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link btn btn-success" href="{% url 'exercises:create' slug%}">Añadir Archivo</a>
+    </li>
+  </ul>
+{% endif %}
+    
+    {%  if request.user|has_group:"Profesor" %}    
+    {% for exercise in exercise_list %}
+    {% if exercise.group|slugify == slug  %}
+    <hr>
+    
+    <ul class="nav justify-content-center">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'exercises:delete' exercise.group|slugify exercise.id %}"><i class="far fa-trash-alt fa-2x"></i></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'exercises:update' exercise.id %}"><i class="far fa-edit fa-2x"></i></a>
+            </li>
+          </ul>
+
+        
+          <div class="row project justify-content-center">  	
+                <div class="col-lg-3 col-md-4 col-sm-6 offset-lg-1 d-block">
+                    <img class="img-thumbnail rounded mx-auto d-block" src=" {% static 'core/img/archive.png' %} ">
+                </div>
+                <div class="col-lg-7 col-md-8">
+                        <div class="card">
+                                <div class="card-header">
+                                Datos del archivo
+                                </div>
+                                <div class="card-body">
+                                <ul class="list-group">
+                                        <li class="media"><h5> {{exercise.title}} </h5></li>                                    
+                                        <li class="media"><span style="color : gray;">Fecha de subida :&nbsp;</span> {{exercise.created.date}} </li>
+                                        <li class="media"><span style="color : gray;">Fecha de entrega :&nbsp;</span> {{exercise.date_delivery.date}} </li>
+                                    </ul>
+                                <br>                            
+                                <a href=" {% url 'exercises:download' exercise.id %} " class="btn btn-success">Descargar</a>
+                            </div>
+                            </div>
+                            </div>
+            </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+
+    {%  if request.user.is_superuser %}
+    {% for exercise in exercise_list %}
+    <hr>
+    
+    <ul class="nav justify-content-center">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'exercises:delete' exercise.group|slugify exercise.id %}"><i class="far fa-trash-alt fa-2x"></i></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'exercises:update' exercise.id %}"><i class="far fa-edit fa-2x"></i></a>
+            </li>
+          </ul>
+
+        
+          <div class="row project justify-content-center">  	
+                <div class="col-lg-3 col-md-4 col-sm-6 offset-lg-1 d-block">
+                    <img class="img-thumbnail rounded mx-auto d-block" src=" {% static 'core/img/archive.png' %} ">
+                </div>
+                <div class="col-lg-7 col-md-8">
+                        <div class="card">
+                                <div class="card-header">
+                                Datos del archivo
+                                </div>
+                                <div class="card-body">
+                                <ul class="list-group">
+                                        <li class="media"><h5> {{exercise.title}} </h5></li>                                    
+                                        <li class="media"><span style="color : gray;">Fecha de subida :&nbsp;</span> {{exercise.created.date}} </li>
+                                        <li class="media"><span style="color : gray;">Fecha de entrega :&nbsp;</span> {{exercise.date_delivery.date}} </li>
+                                    </ul>
+                                <br>                            
+                                <a href=" {% url 'exercises:download' exercise.id %} " class="btn btn-success">Descargar</a>
+                            </div>
+                            </div>
+                            </div>
+            </div>
+    {% endfor %}
+    {% endif %}
+
+    {%  if request.user|has_group:"Alumno" %}    
+    {% for exercise in exercise_list %}
+    
+    <hr>
+        
+          <div class="row project justify-content-center">  	
+                <div class="col-lg-3 col-md-4 col-sm-6 offset-lg-1 d-block">
+                    <img class="img-thumbnail rounded mx-auto d-block" src=" {% static 'core/img/archive.png' %} ">
+                </div>
+                <div class="col-lg-7 col-md-8">
+                        <div class="card">
+                                <div class="card-header">
+                                Datos del archivo
+                                </div>
+                                <div class="card-body">
+                                <ul class="list-group">
+                                        <li class="media"><h5> {{exercise.title}} </h5></li>                                    
+                                        <li class="media"><span style="color : gray;">Fecha de subida :&nbsp;</span> {{exercise.created.date}} </li>
+                                        <li class="media"><span style="color : gray;">Fecha de entrega :&nbsp;</span> {{exercise.date_delivery.date}} </li>
+                                    </ul>
+                                <br>                            
+                                <a href=" {% url 'exercises:download' exercise.id %} " class="btn btn-success">Descargar</a>
+                            </div>
+                            </div>
+                            </div>
+            </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Menú de paginación -->
+
+    <br>
+    <br>
+{% if is_paginated %}
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item ">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+      </li>
+    {% endif %}
+    {% for i in paginator.page_range %}
+      <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+      </li>
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <li class="page-item ">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1">&raquo;</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

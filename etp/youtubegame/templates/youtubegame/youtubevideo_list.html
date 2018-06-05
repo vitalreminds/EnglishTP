@@ -1,0 +1,105 @@
+{% extends 'core/base.html' %}
+
+{% block title %}YoutubeGame{% endblock %}
+
+{% block background %}{% load static %}{% static 'core/img/juego-bg.jpg' %}{% endblock %}
+
+{% load auth_extras %}
+{% block headers %}
+<h1>Juego</h1>
+<span class="subheading">Diviertete</span>
+{% endblock %}
+
+
+{% block content %}
+
+{% if 'okdelete' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Video eliminado correctamente
+</div>
+{% endif %}
+
+{% if 'okcreate' in request.GET %}
+<div class="alert alert-success" role="alert">
+    Video creado correctamente
+</div>
+{% endif %}
+    
+        
+        {%  if request.user.is_superuser %}
+        <div class="container">
+                <div class="row justify-content-end">
+                  <div class="col-md-2 ">
+                  <a class="btn btn-block btn-success" href=" {% url 'youtubegame:create' %} "> Añadir video</a>          
+                  </div>
+                </div>
+              </div>
+        {% endif %}
+            {% for youtubevideo in youtubevideo_list %}
+            <hr>
+            <ul class="nav justify-content-center">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'youtubegame:delete' youtubevideo.id %}"><i class="far fa-trash-alt fa-2x"></i></a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'youtubegame:update' youtubevideo.id %}"><i class="far fa-edit fa-2x"></i></a>
+                    </li>
+                  </ul>
+                        
+                  <div class="row project justify-content-center">  	
+                        <div class="col-lg-3 col-md-4 col-sm-6 offset-lg-1">
+                            <img class="img-thumbnail" src="https://img.youtube.com/vi/{{youtubevideo.videoId}}/0.jpg" alt="portadaVideo">
+                        </div>
+                        <div class="col-lg-7 col-md-8">
+                                <div class="card">
+                                        <div class="card-header">
+                                        Datos del video
+                                        </div>
+                                        <div id="{{youtubevideo.videoId}}" class="card-body">
+                                                <ul class="list-group">
+                                                        <li class="media"><h5> {{youtubevideo.title}} </h5></li> 
+                                                        <li class="media"><span style="color : gray;">Vistas :&nbsp;</span> {{youtubevideo.views}} </li>
+                                                        <li class="media"><span style="color : gray;">Duracion :&nbsp;</span> {{youtubevideo.duration}} </li>
+                                                </ul>
+                                        </div>
+                                <a href=" {% url 'youtubegame:play' youtubevideo.id %} " class="btn btn-success">Jugar</a>
+                                    
+                                    </div>
+                                    </div>
+                    </div>
+            {% endfor %}
+
+            <br>
+            <br>
+    
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                  <li class="page-item ">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+                  </li>
+                {% endif %}
+                {% for i in paginator.page_range %}
+                  <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                  </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                  <li class="page-item ">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">&raquo;</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+            {% endif %}
+
+{% endblock %}
