@@ -1,2 +1,3 @@
 # EnglishTP
-Primer proyecto escolar utilizando django
+School project using django
+http://vitalreminds.pythonanywhere.com/
